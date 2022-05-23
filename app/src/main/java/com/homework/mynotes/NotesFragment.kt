@@ -42,4 +42,9 @@ class NotesFragment : Fragment() {
         noteId = id
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(NOTE_ID, noteId)
+    }
+
 }

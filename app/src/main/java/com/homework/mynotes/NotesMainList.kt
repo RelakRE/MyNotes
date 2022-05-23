@@ -17,7 +17,7 @@ class NotesMainList : Fragment() {
     ): View? {
 
         view?.findViewById<Button>(R.id.buttonAdd)?.setOnClickListener {
-            val fragContainer = view?.findViewById<FrameLayout>(R.id.fragment_container)
+//            val fragContainer = view?.findViewById<FrameLayout>(R.id.fragment_container)
 //            if (fragContainer  == null){
 //                val fragDetails = NotesFragment()
 //                fragDetails.setNoteId(-1)
