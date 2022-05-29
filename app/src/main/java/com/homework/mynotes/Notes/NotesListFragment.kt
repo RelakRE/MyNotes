@@ -1,4 +1,4 @@
-package com.homework.mynotes
+package com.homework.mynotes.Notes
 
 import android.content.Context
 import android.os.Bundle
@@ -12,10 +12,10 @@ import androidx.fragment.app.ListFragment
 class NotesListFragment : ListFragment() {
 
     internal interface Listener {
-        fun itemClicked(id: Int)
+        fun notesListItemClicked(id: Int)
     }
 
-    private var listener: Listener?  = null
+    private var listener: Listener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,12 +25,11 @@ class NotesListFragment : ListFragment() {
         val names = Array(NotesData.listNotes.size) { i ->
             NotesData.listNotes[i].title
         }
-        val adapter = ArrayAdapter(
+
+        listAdapter = ArrayAdapter(
             inflater.context, android.R.layout.simple_list_item_1,
             names
         )
-
-        listAdapter = adapter
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -41,6 +40,6 @@ class NotesListFragment : ListFragment() {
     }
 
     override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
-        listener?.itemClicked(position)
+        listener?.notesListItemClicked(position)
     }
 }
