@@ -23,12 +23,12 @@ class NoteRecyclerAdapter(val context: Context) :
     private var mRecentlyDeletedItem: NotesData? = null
     private var mRecentlyDeletedItemPosition: Int? = null
 
-    class Holder(itemView: View, private val context: Context) : RecyclerView.ViewHolder(itemView) {
-        private val titleView: TextView = itemView.findViewById(com.homework.mynotes.R.id.title)
-        private val descriptionView: TextView = itemView.findViewById(com.homework.mynotes.R.id.description)
-        private val dateView: TextView = itemView.findViewById(com.homework.mynotes.R.id.date)
+    class Holder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+        private val titleView: TextView = itemView.findViewById(R.id.title)
+        private val descriptionView: TextView = itemView.findViewById(R.id.description)
+        private val dateView: TextView = itemView.findViewById(R.id.date)
 
-        private val listener: Listener? = context as Listener
+        private val listener: Listener = context as Listener
 
         fun bind(position: Int) {
             val notesData = NotesData.findNoteById(position)
@@ -39,7 +39,7 @@ class NoteRecyclerAdapter(val context: Context) :
 
         fun setListener(position: Int) {
             itemView.setOnClickListener {
-                listener?.notesListItemClicked(position)
+                listener.notesListItemClicked(position)
             }
         }
 
@@ -56,7 +56,7 @@ class NoteRecyclerAdapter(val context: Context) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return Holder(
             LayoutInflater.from(parent.context).inflate(
-                com.homework.mynotes.R.layout.note_list_item,
+                R.layout.note_list_item,
                 parent, false
             ), context
         )

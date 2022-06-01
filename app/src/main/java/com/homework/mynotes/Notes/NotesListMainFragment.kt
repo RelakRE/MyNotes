@@ -1,7 +1,6 @@
 package com.homework.mynotes.Notes
 
 import android.os.Bundle
-import android.text.TextUtils.replace
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.homework.mynotes.MainActivity
 import com.homework.mynotes.R
 import com.homework.mynotes.SwipeToDeleteCallback
 import com.homework.mynotes.adapters.NoteRecyclerAdapter
@@ -46,18 +46,10 @@ class NotesListMainFragment : Fragment() {
 
     private fun intiFABAdd() {
         view?.findViewById<View>(R.id.fab_add)?.setOnClickListener {
-            openNewNotes()
+            val curActivity = requireActivity()
+            if (curActivity is MainActivity){
+                curActivity.openNewNotes()
+            }
         }
     }
-
-    private fun openNewNotes() {
-        val newFragDetail = NotesFragment()
-        newFragDetail.setNoteId(NotesFragment.getNewID())
-
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.main_frag, newFragDetail)
-            ?.addToBackStack(null)
-            ?.commit()
-    }
-
 }

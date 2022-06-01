@@ -28,16 +28,5 @@
 
 
 
-<!--    <fragment-->
-<!--        android:id="@+id/list_notes"-->
-<!--        android:name="com.homework.mynotes.Notes.NotesListFragment"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-
-<!--    </fragment>-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 

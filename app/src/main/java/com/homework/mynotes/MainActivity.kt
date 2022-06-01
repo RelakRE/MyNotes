@@ -1,9 +1,12 @@
 package com.homework.mynotes
 
 import android.os.Bundle
-import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.homework.mynotes.Notes.NotesData
 import com.homework.mynotes.Notes.NotesFragment
@@ -16,7 +19,9 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
         setContentView(R.layout.activity_main)
 
         initMainFragment()
+        initToolbarDrawer()
     }
+
 
     override fun onBackPressed() {
         val currentFrag = supportFragmentManager.findFragmentById(R.id.main_frag) as Fragment
@@ -53,4 +58,55 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
             .show()
     }
 
+    private fun initToolbarDrawer() {
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        initDrawer(toolbar)
+    }
+
+    private fun initDrawer(toolbar: Toolbar) {
+
+        val drawer: DrawerLayout = findViewById(R.id.drawer_layout)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawer, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        val navigationView: NavigationView = findViewById(R.id.navigation_view)
+        navigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.action_drawer_about -> {
+                    Snackbar.make(
+                        findViewById(R.id.main_frag),
+                        "Это кнопка ради кнопки",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction("Понял", {})
+                        .show()
+                }
+                R.id.action_drawer_exit -> {
+                    finish()
+                }
+                R.id.add_item -> {
+                    openNewNotes()
+                    drawer.close()
+                }
+            }
+            return@setNavigationItemSelectedListener false
+        }
+    }
+
+    fun openNewNotes() {
+        val newFragDetail = NotesFragment()
+        newFragDetail.setNoteId(NotesFragment.getNewID())
+
+        this.supportFragmentManager.beginTransaction()
+            .replace(R.id.main_frag, newFragDetail)
+            .addToBackStack(null)
+            .commit()
+    }
 }
