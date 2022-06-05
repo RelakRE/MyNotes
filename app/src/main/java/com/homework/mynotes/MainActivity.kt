@@ -1,7 +1,9 @@
 package com.homework.mynotes
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,7 +15,13 @@ import com.homework.mynotes.Notes.NotesFragment
 import com.homework.mynotes.Notes.NotesListMainFragment
 import com.homework.mynotes.adapters.NoteRecyclerAdapter
 
-class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
+interface exitable{
+    fun doExit()
+}
+
+class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener, exitable {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -89,7 +97,7 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
                         .show()
                 }
                 R.id.action_drawer_exit -> {
-                    finish()
+                    showAlertExit()
                 }
                 R.id.add_item -> {
                     openNewNotes()
@@ -100,6 +108,20 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
         }
     }
 
+    private fun showAlertExit() {
+        AlertDialog.Builder(this)
+            .setTitle("Выйти?")
+            .setMessage("приложение будет закрыто.")
+            .setPositiveButton("Да") { _, _ ->
+                run {
+                    if (this is exitable)
+                        this.doExit()
+                }
+            }
+            .setNeutralButton("Отмена") { dialog, _ -> dialog.cancel() }
+            .show()
+    }
+
     fun openNewNotes() {
         val newFragDetail = NotesFragment()
         newFragDetail.setNoteId(NotesFragment.getNewID())
@@ -108,5 +130,12 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
             .replace(R.id.main_frag, newFragDetail)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun doExit() {
+        this.finish()
+        Toast
+            .makeText(this, "Приложение закрыто", Toast.LENGTH_LONG)
+            .show()
     }
 }
