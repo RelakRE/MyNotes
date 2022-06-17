@@ -16,4 +16,6 @@
     <string name="navigation_drawer_open">open drawer</string>
     <string name="add_item">Добавить заметку</string>
     <string name="cat">кот</string>
+    <string name="Удалить">Удалить</string>
+    <string name="edit">Изменить</string>
 </resources>

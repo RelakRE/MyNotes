@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.homework.mynotes.MainActivity
@@ -20,15 +21,23 @@ class NoteRecyclerAdapter(val context: Context) :
         fun notesListItemClicked(id: Int)
     }
 
+    private val listener: Listener = context as Listener
     private var mRecentlyDeletedItem: NotesData? = null
     private var mRecentlyDeletedItemPosition: Int? = null
+    var menuPosition = 0
 
-    class Holder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+    class Holder(
+        itemView: View,
+        context: Context,
+        private val adapter: NoteRecyclerAdapter
+    ) : RecyclerView.ViewHolder(itemView) {
         private val titleView: TextView = itemView.findViewById(R.id.title)
         private val descriptionView: TextView = itemView.findViewById(R.id.description)
         private val dateView: TextView = itemView.findViewById(R.id.date)
 
-        private val listener: Listener = context as Listener
+        private val currentFrag =
+            (context as MainActivity).supportFragmentManager.findFragmentById(R.id.main_frag)
+                    as Fragment
 
         fun bind(position: Int) {
             val notesData = NotesData.findNoteById(position)
@@ -39,7 +48,11 @@ class NoteRecyclerAdapter(val context: Context) :
 
         fun setListener(position: Int) {
             itemView.setOnClickListener {
-                listener.notesListItemClicked(position)
+                adapter.editNote(position)
+            }
+            itemView.setOnLongClickListener {
+                adapter.menuPosition = adapterPosition
+                return@setOnLongClickListener false
             }
         }
 
@@ -51,6 +64,14 @@ class NoteRecyclerAdapter(val context: Context) :
                 subString
             }
         }
+
+        fun registerContextMenu() {
+            currentFrag.registerForContextMenu(itemView)
+        }
+    }
+
+    fun editNote(position: Int) {
+        listener.notesListItemClicked(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -58,13 +79,14 @@ class NoteRecyclerAdapter(val context: Context) :
             LayoutInflater.from(parent.context).inflate(
                 R.layout.note_list_item,
                 parent, false
-            ), context
+            ), context, this
         )
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(position)
         holder.setListener(position)
+        holder.registerContextMenu()
     }
 
     override fun getItemCount(): Int {
@@ -80,7 +102,7 @@ class NoteRecyclerAdapter(val context: Context) :
     }
 
     private fun showUndoSnackbar() {
-        if (context is MainActivity){
+        if (context is MainActivity) {
             val view: View = context.findViewById(R.id.main_frag)
 
             val snackbar: Snackbar = Snackbar.make(
@@ -98,7 +120,7 @@ class NoteRecyclerAdapter(val context: Context) :
             mRecentlyDeletedItem!!
         )
 //        notifyItemInserted(mRecentlyDeletedItemPosition!!)
-        notifyItemInserted(NotesData.getSize()-1)
+        notifyItemInserted(NotesData.getSize() - 1)
     }
 
 
