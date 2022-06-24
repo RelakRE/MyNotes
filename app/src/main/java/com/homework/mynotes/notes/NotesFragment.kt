@@ -1,4 +1,4 @@
-package com.homework.mynotes.Notes
+package com.homework.mynotes.notes
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.homework.mynotes.R
+import com.homework.mynotes.dataNotes.NotesData
 
 
 class NotesFragment : Fragment() {

@@ -8,9 +8,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.homework.mynotes.Notes.NotesData
-import com.homework.mynotes.Notes.NotesFragment
-import com.homework.mynotes.Notes.NotesListMainFragment
+import com.homework.mynotes.dataNotes.NotesData
+import com.homework.mynotes.notes.NotesFragment
+import com.homework.mynotes.notes.NotesListMainFragment
 import com.homework.mynotes.adapters.NoteRecyclerAdapter
 
 class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {

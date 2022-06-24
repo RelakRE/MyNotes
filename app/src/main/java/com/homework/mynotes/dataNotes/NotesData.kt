@@ -1,4 +1,4 @@
-package com.homework.mynotes.Notes
+package com.homework.mynotes.dataNotes
 
 import java.util.*
 

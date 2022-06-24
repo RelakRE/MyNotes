@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.homework.mynotes.MainActivity
-import com.homework.mynotes.Notes.NotesData
+import com.homework.mynotes.dataNotes.NotesData
 import com.homework.mynotes.R
 import java.text.DateFormat
 

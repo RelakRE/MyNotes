@@ -1,4 +1,4 @@
-package com.homework.mynotes.Notes
+package com.homework.mynotes.notes
 
 import android.content.Context
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.ListFragment
+import com.homework.mynotes.dataNotes.NotesData
 
 class NotesListFragment : ListFragment() {
 

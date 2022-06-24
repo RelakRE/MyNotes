@@ -1,4 +1,4 @@
-package com.homework.mynotes.Notes
+package com.homework.mynotes.notes
 
 import android.os.Bundle
 import android.view.LayoutInflater
