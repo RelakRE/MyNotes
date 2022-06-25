@@ -15,7 +15,9 @@ class CardDataMapping {
                 doc[TITLE] as String,
                 doc[DESCRIPTION] as String
             )
-            answer.id = id
+            if (id.isNotEmpty()) {
+                answer.id = id
+            }
             return answer
         }
 

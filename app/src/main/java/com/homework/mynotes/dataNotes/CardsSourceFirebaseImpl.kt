@@ -1,11 +1,8 @@
 package com.homework.mynotes.dataNotes
 
 import android.util.Log
-import androidx.annotation.NonNull
 import com.google.firebase.firestore.FirebaseFirestore
 import com.homework.mynotes.interfases.CardsSource
-import java.util.ArrayList
-import kotlin.collections.ArrayList
 
 
 class CardsSourceFirebaseImpl : CardsSource {
@@ -17,7 +14,7 @@ class CardsSourceFirebaseImpl : CardsSource {
 
     private val collection = store.collection(CARDS_COLLECTION)
 
-    val cardsData: List<CardData> = ArrayList()
+    private val cardsData: List<CardData> = ArrayList()
 
     fun init(cardsSourceResponse: CardsSourceResponse) {
         collection.get()
@@ -27,48 +24,41 @@ class CardsSourceFirebaseImpl : CardsSource {
                         val doc = it.data
                         val id = it.id
                         val cardData = CardDataMapping.toCardData(id, doc)
-                        cardsData.add(cardData)
+                        (cardsData as ArrayList<CardData>).add(cardData)
                     }
 
-                    Log.d(TAG, "success " + cardsData.size() + " qnt");
+                    Log.d(TAG, "success " + cardsData.size + " qnt");
                     cardsSourceResponse.initialized(CardsSourceFirebaseImpl.this);
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    Log.d(TAG, "get failed with ", it.exception);
                 }
             }
-    })
-    .addOnFailureListener(new OnFailureListener()
-    {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-            Log.d(TAG, "get failed with ", e);
-        }
-    });
-    return this;
-}
+    }
 
 
-override fun getCardData(position: Int): CardData {
-    TODO("Not yet implemented")
-}
+    override fun getCardData(position: Int): CardData {
+        return cardsData[position]
+    }
 
-override fun size(): Int {
-    TODO("Not yet implemented")
-}
+    override fun size(): Int {
+        return cardsData.size
+    }
 
-override fun deleteCardData(position: Int) {
-    TODO("Not yet implemented")
-}
+    override fun deleteCardData(position: Int) {
+        collection.
+        cardsData.drop(position)
+    }
 
-override fun updateCardData(position: Int, cardData: CardData?) {
-    TODO("Not yet implemented")
-}
+    override fun updateCardData(position: Int, cardData: CardData) {
+        (cardsData as ArrayList<CardData>).add(position, cardData)
+    }
 
-override fun addCardData(cardData: CardData?) {
-    TODO("Not yet implemented")
-}
+    override fun addCardData(cardData: CardData) {
+        collection.add(CardDataMapping.toDocument(cardData))
+        (cardsData as ArrayList<CardData>).add(cardData)
+    }
 
-override fun clearCardData() {
-    TODO("Not yet implemented")
-}
+    override fun clearCardData() {
+
+    }
 }
