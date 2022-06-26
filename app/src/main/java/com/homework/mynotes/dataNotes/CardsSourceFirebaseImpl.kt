@@ -1,8 +1,10 @@
 package com.homework.mynotes.dataNotes
 
 import android.util.Log
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.homework.mynotes.interfases.CardsSource
+import com.homework.mynotes.interfases.CardsSourceResponse
 
 
 class CardsSourceFirebaseImpl : CardsSource {
@@ -14,25 +16,73 @@ class CardsSourceFirebaseImpl : CardsSource {
 
     private val collection = store.collection(CARDS_COLLECTION)
 
-    private val cardsData: List<CardData> = ArrayList()
+    private var cardsData: List<CardData> = ArrayList()
 
-    fun init(cardsSourceResponse: CardsSourceResponse) {
-        collection.get()
-            .addOnCompleteListener { it ->
-                if (it.isSuccessful) {
-                    it.result.forEach {
-                        val doc = it.data
-                        val id = it.id
-                        val cardData = CardDataMapping.toCardData(id, doc)
+    companion object{
+        lateinit var currentFireBase: CardsSourceFirebaseImpl
+    }
+
+    override fun init(cardsSourceResponse: CardsSourceResponse): CardsSourceFirebaseImpl {
+
+        collection.addSnapshotListener { value, error ->
+
+            if (error != null) {
+                Log.e("FireBase error", error.message.toString())
+                return@addSnapshotListener
+            }
+
+            value?.documentChanges?.forEach {
+                val doc = it.document.data
+                val id = it.document.id
+                val cardData = CardDataMapping.toCardData(id, doc)
+                when (it.type) {
+                    DocumentChange.Type.ADDED -> {
                         (cardsData as ArrayList<CardData>).add(cardData)
+                        cardsSourceResponse.added(this)
                     }
+                    DocumentChange.Type.MODIFIED -> {
+                        val elementArray = cardsData.find { elArray -> elArray.id == cardData.id }
+                        if (elementArray != null) {
+                            elementArray.title = cardData.title
+                            elementArray.description = cardData.description
+                            cardsSourceResponse.modified(cardsData.indexOf(elementArray))
+                        }
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        val elementArray = cardsData.find { elArray -> elArray.id == cardData.id }
+                        if (elementArray != null) {
+                            val indexRemove = cardsData.indexOf(elementArray)
+                            (cardsData as ArrayList<CardData>).removeAt(indexRemove)
+                            cardsSourceResponse.removed(indexRemove)
+                        }
 
-                    Log.d(TAG, "success " + cardsData.size + " qnt");
-                    cardsSourceResponse.initialized(CardsSourceFirebaseImpl.this);
-                } else {
-                    Log.d(TAG, "get failed with ", it.exception);
+                    }
+                    else -> {
+                        Log.e("Firebase unknown event", it.type.toString())
+                    }
                 }
             }
+            cardsSourceResponse.initialized(this)
+
+        }
+//        collection.get()
+//            .addOnCompleteListener { it ->
+//                if (it.isSuccessful) {
+//                    it.result.forEach {
+//                        val doc = it.data
+//                        val id = it.id
+//                        val cardData = CardDataMapping.toCardData(id, doc)
+//                        (cardsData as ArrayList<CardData>).add(cardData)
+//                    }
+//
+//                    Log.d(TAG, "success " + cardsData.size + " qnt");
+//                    cardsSourceResponse.initialized(this)
+//                } else {
+//                    Log.d(TAG, "get failed with ", it.exception);
+//                }
+//            }
+        currentFireBase = this
+        return this
     }
 
 
@@ -45,20 +95,38 @@ class CardsSourceFirebaseImpl : CardsSource {
     }
 
     override fun deleteCardData(position: Int) {
-        collection.
-        cardsData.drop(position)
+        collection.document(cardsData[position].id).delete()
+        (cardsData as ArrayList<CardData>).removeAt(position)
     }
 
-    override fun updateCardData(position: Int, cardData: CardData) {
-        (cardsData as ArrayList<CardData>).add(position, cardData)
+    override fun updateCardData(cardData: CardData) {
+        collection.document(cardData.id).set(cardData)
+        val elementArray = cardsData.find { elArray -> elArray.id == cardData.id }
+        if (elementArray != null) {
+            elementArray.title = cardData.title
+            elementArray.description = cardData.description
+        }
     }
 
     override fun addCardData(cardData: CardData) {
         collection.add(CardDataMapping.toDocument(cardData))
-        (cardsData as ArrayList<CardData>).add(cardData)
+            .addOnSuccessListener { documentReference ->
+                cardData.id = documentReference.id
+            }
     }
 
     override fun clearCardData() {
-
+        cardsData.forEach { collection.document(it.id).delete() }
+        cardsData = ArrayList()
     }
+
+    fun replaceNote(cardData: CardData) {
+
+        if (cardData.id.isEmpty()) {
+            addCardData(cardData)
+        } else {
+            updateCardData(cardData)
+        }
+    }
+
 }

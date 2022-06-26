@@ -8,10 +8,11 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.homework.mynotes.dataNotes.NotesData
+import com.homework.mynotes.adapters.NoteRecyclerAdapter
+import com.homework.mynotes.dataNotes.CardData
+import com.homework.mynotes.dataNotes.CardsSourceFirebaseImpl
 import com.homework.mynotes.notes.NotesFragment
 import com.homework.mynotes.notes.NotesListMainFragment
-import com.homework.mynotes.adapters.NoteRecyclerAdapter
 
 class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,23 +23,23 @@ class MainActivity : AppCompatActivity(), NoteRecyclerAdapter.Listener {
         initToolbarDrawer()
     }
 
-
     override fun onBackPressed() {
         val currentFrag = supportFragmentManager.findFragmentById(R.id.main_frag) as Fragment
         if (currentFrag is NotesFragment) {
             if (currentFrag.view != null) {
-                NotesData.replaceNote(
-                    currentFrag.getIdNote(),
-                    NotesData(currentFrag.getTitle(), currentFrag.getDescription())
-                )
+                val cardData = CardData(currentFrag.getTitle(), currentFrag.getDescription())
+                cardData.id = currentFrag.cardId
+
+                CardsSourceFirebaseImpl().replaceNote(cardData)
             }
         }
         super.onBackPressed()
     }
 
-    override fun notesListItemClicked(id: Int) {
+    override fun notesListItemClicked(id: Int, idCard: String) {
         val fragDetails = NotesFragment()
         fragDetails.setNoteId(id)
+        fragDetails.setIdCard(idCard)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_frag, fragDetails)

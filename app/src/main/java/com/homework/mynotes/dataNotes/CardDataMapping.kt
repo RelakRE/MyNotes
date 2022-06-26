@@ -6,14 +6,14 @@ class CardDataMapping {
 
     companion object Fields{
         const val DATE = "dateOFCreation"
-        const val TITLE = "title"
-        const val DESCRIPTION = "description"
+        private const val TITLE = "title"
+        private const val DESCRIPTION = "description"
 
         fun toCardData(id: String, doc: Map<String, Any>): CardData {
-            val timeStamp: Timestamp? = doc[DATE] as Timestamp?
+//            val timeStamp: Timestamp? = doc[DATE] as Timestamp?
             val answer = CardData(
-                doc[TITLE] as String,
-                doc[DESCRIPTION] as String
+                doc[TITLE] as String?,
+                doc[DESCRIPTION] as String?
             )
             if (id.isNotEmpty()) {
                 answer.id = id
@@ -23,8 +23,8 @@ class CardDataMapping {
 
         fun toDocument(cardData: CardData): Map<String, Any> {
             val answer: MutableMap<String, Any> = HashMap()
-            answer[TITLE] = cardData.title
-            answer[DESCRIPTION] = cardData.description
+            answer[TITLE] = cardData.title.toString()
+            answer[DESCRIPTION] = cardData.description.toString()
 //        answer[DATE] = cardData.getDate()
             return answer
         }

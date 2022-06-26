@@ -8,49 +8,52 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.homework.mynotes.MainActivity
-import com.homework.mynotes.dataNotes.NotesData
 import com.homework.mynotes.R
-import java.text.DateFormat
+import com.homework.mynotes.dataNotes.CardData
+import com.homework.mynotes.dataNotes.CardsSourceFirebaseImpl
+import com.homework.mynotes.dataNotes.NotesData
+import com.homework.mynotes.interfases.CardsSource
 
 
 class NoteRecyclerAdapter(val context: Context) :
     RecyclerView.Adapter<NoteRecyclerAdapter.Holder>() {
 
     internal interface Listener {
-        fun notesListItemClicked(id: Int)
+        fun notesListItemClicked(id: Int, idCard: String)
     }
 
-    private var mRecentlyDeletedItem: NotesData? = null
+    var dataSource: CardsSource = CardsSourceFirebaseImpl()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    private var mRecentlyDeletedItem: CardData? = null
     private var mRecentlyDeletedItemPosition: Int? = null
 
-    class Holder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+    class Holder(itemView: View, context: Context, private val dataSource: CardsSource) :
+        RecyclerView.ViewHolder(itemView) {
         private val titleView: TextView = itemView.findViewById(R.id.title)
         private val descriptionView: TextView = itemView.findViewById(R.id.description)
-        private val dateView: TextView = itemView.findViewById(R.id.date)
+        var cardId = ""
+//        private val dateView: TextView = itemView.findViewById(R.id.date)
 
         private val listener: Listener = context as Listener
 
         fun bind(position: Int) {
-            val notesData = NotesData.findNoteById(position)
-            titleView.text = getTextItem(notesData.title)
-            descriptionView.text = getTextItem(notesData.description)
-            dateView.text = DateFormat.getDateInstance().format(notesData.dateOFCreation.time)
+            val notesData = dataSource.getCardData(position)
+            titleView.text = if(notesData.title == null) "" else notesData.title
+            descriptionView.text = if(notesData.description == null) "" else notesData.description
+            cardId = notesData.id
+//            dateView.text = DateFormat.getDateInstance().format(notesData.dateOFCreation.time)
         }
 
-        fun setListener(position: Int) {
+        fun setListener(id: Int, idCard: String) {
             itemView.setOnClickListener {
-                listener.notesListItemClicked(position)
+                listener.notesListItemClicked(id, idCard)
             }
         }
 
-        private fun getTextItem(fullDescription: String): String {
-            val subString = fullDescription.substringBefore("\n")
-            return if (subString.length > 20) {
-                subString.substring(0, 20)
-            } else {
-                subString
-            }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -58,47 +61,47 @@ class NoteRecyclerAdapter(val context: Context) :
             LayoutInflater.from(parent.context).inflate(
                 R.layout.note_list_item,
                 parent, false
-            ), context
+            ), context, dataSource
         )
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(position)
-        holder.setListener(position)
+        holder.setListener(position, holder.cardId)
     }
 
     override fun getItemCount(): Int {
-        return NotesData.getSize()
+        return dataSource.size()
     }
 
     fun deleteItem(adapterPosition: Int) {
-        mRecentlyDeletedItem = NotesData.findNoteById(adapterPosition)
+        mRecentlyDeletedItem = dataSource.getCardData(adapterPosition)
         mRecentlyDeletedItemPosition = adapterPosition
-        NotesData.remove(adapterPosition)
+        dataSource.deleteCardData(adapterPosition)
         notifyItemRemoved(adapterPosition)
-        showUndoSnackbar()
+        showUndoSnack()
     }
 
-    private fun showUndoSnackbar() {
-        if (context is MainActivity){
+    private fun showUndoSnack() {
+        if (context is MainActivity) {
             val view: View = context.findViewById(R.id.main_frag)
 
-            val snackbar: Snackbar = Snackbar.make(
+            val snack: Snackbar = Snackbar.make(
                 view, R.string.snack_bar_text,
                 Snackbar.LENGTH_LONG
             )
-            snackbar.setAction(R.string.snack_bar_undo) { undoDelete() }
-            snackbar.show()
+            snack.setAction(R.string.snack_bar_undo) { undoDelete() }
+            snack.show()
         }
 
     }
 
     private fun undoDelete() {
-        NotesData.addNote(
+        dataSource.addCardData(
             mRecentlyDeletedItem!!
         )
 //        notifyItemInserted(mRecentlyDeletedItemPosition!!)
-        notifyItemInserted(NotesData.getSize()-1)
+        notifyItemInserted(dataSource.size())
     }
 
 

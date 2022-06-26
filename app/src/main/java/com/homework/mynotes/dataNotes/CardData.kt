@@ -1,6 +1,6 @@
 package com.homework.mynotes.dataNotes
 
-class CardData(val title : String,val description : String) {
+class CardData(var title : String?, var description : String?) {
 
     var id = ""
 
